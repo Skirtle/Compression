@@ -9,3 +9,9 @@
 *.vcxproj
 *.filters
 *.user
+*.ipch
+*.tlog
+
+Compression/Compression/Debug/
+Compression/Debug/
+Compression/.vs/Compression/v16/.suo

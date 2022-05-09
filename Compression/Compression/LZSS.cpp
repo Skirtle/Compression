@@ -3,9 +3,9 @@
 
 
 // Globals
-constexpr auto SLIDE_WINDOW_SIZE = 15;
+constexpr auto SLIDE_WINDOW_SIZE = 9;
 constexpr auto LOOK_AHEAD_BUFFER_SIZE = 4;
-constexpr auto SEARCH_BUFFER_SIZE = 11;
+constexpr auto SEARCH_BUFFER_SIZE = 5;
 
 // Classes
 // Encoded characters
@@ -33,18 +33,19 @@ EC* LZSSEncode(std::string input);
 std::ostream& operator<< (std::ostream& out, const EC& data);
 void printWindow(char* window);
 void moveWindowLeft(char* window, char nextChar);
+void printEncode(EC* encoding);
+std::string LZSSDecode(EC* encode);
+bool encodeDecode(std::string str);
 
 
 // main
 int main() {
-	std::string testStr = "repetitive repeat";
+	std::string testStr = "abcdedede";
 	EC* encoded = LZSSEncode(testStr);
 
-	std::cout << encoded[0].size << "\n";
-	for (int i = 0; i < encoded[0].size; i++) {
-		std::cout << encoded[i];
-	}
-	std::cout << "\n";
+	
+	printEncode(encoded);
+	encodeDecode(testStr);
 
 
 	free(encoded);
@@ -161,4 +162,39 @@ void moveWindowLeft(char* window, char nextChar) {
 		window[i] = window[i + 1];
 	}
 	window[SLIDE_WINDOW_SIZE - 1] = nextChar;
+}
+
+std::string LZSSDecode(EC* encode) {
+	std::string decode = "";
+
+	for (int index = 0; index < encode[0].size; index++) {
+
+		if (encode[index].isChar) {
+			decode = decode + encode[index].character;
+		}
+		else {
+			int offset = encode[index].offset;
+			int length = encode[index].length;
+			for (int i = 0; i < length; i++) {
+				decode = decode + decode.at(decode.length() - offset);
+			}
+		}
+	}
+	return decode;
+}
+
+bool encodeDecode(std::string str) {
+	EC* encode = LZSSEncode(str);
+	bool same = str.compare(LZSSDecode(encode)) == 0;
+	free(encode);
+	if (same) std::cout << "Success\n";
+	else std::cout << "Failure\n";
+	return same;
+}
+
+void printEncode(EC* encoding) {
+	for (int i = 0; i < encoding[0].size; i++) {
+		std::cout << encoding[i];
+	}
+	std::cout << "\n";
 }

@@ -3,16 +3,16 @@
 
 
 // Globals
-constexpr auto SLIDE_WINDOW_SIZE = 9;
+constexpr auto SLIDE_WINDOW_SIZE = 15;
 constexpr auto LOOK_AHEAD_BUFFER_SIZE = 4;
-constexpr auto SEARCH_BUFFER_SIZE = 5;
+constexpr auto SEARCH_BUFFER_SIZE = 11;
 
 // Classes
 // Encoded characters
 class EC {
 public:
 	bool isChar = false;
-	int offset = -1, length = -1, size = -1;
+	uint8_t offset = 0, length = 0, size = 0;
 	char character = 0;
 
 	EC() {
@@ -40,7 +40,7 @@ bool encodeDecode(std::string str);
 
 // main
 int main() {
-	std::string testStr = "abcdedede";
+	std::string testStr = "compress the compression";
 	EC* encoded = LZSSEncode(testStr);
 
 	
@@ -142,7 +142,8 @@ EC* LZSSEncode(std::string input) {
 std::ostream& operator<< (std::ostream& out, const EC& data) {
 	if (data.isChar) out << data.character;
 	else {
-		out << '(' << data.offset << ',' << data.length << ')';
+		out << '(' << (int) data.offset << ',' << (int) data.length << ')';
+		//out << data.offset << data.length;
 	}
 	return out;
 }

@@ -11,9 +11,9 @@ constexpr auto SEARCH_BUFFER_SIZE = 11;
 // Encoded characters
 class EC {
 public:
-	bool isChar = NULL;
-	int offset = NULL, length = NULL;
-	char character = NULL;
+	bool isChar = false;
+	int offset = -1, length = -1, size = -1;
+	char character = 0;
 
 	EC() {
 	}
@@ -32,24 +32,35 @@ public:
 EC* LZSSEncode(std::string input);
 std::ostream& operator<< (std::ostream& out, const EC& data);
 void printWindow(char* window);
-void moveWindowRight(char* window, char nextChar);
+void moveWindowLeft(char* window, char nextChar);
 
 
 // main
 int main() {
 	std::string testStr = "repetitive repeat";
-	LZSSEncode(testStr);
+	EC* encoded = LZSSEncode(testStr);
 
+	std::cout << encoded[0].size << "\n";
+	for (int i = 0; i < encoded[0].size; i++) {
+		std::cout << encoded[i];
+	}
+	std::cout << "\n";
+
+
+	free(encoded);
 	return 0;
 }
 
 EC* LZSSEncode(std::string input) {
+	// Variables
+	int index = LOOK_AHEAD_BUFFER_SIZE - 1, encodedIndex = 0;
+	const int inputLen = input.length();
+
 	// Buffers
-	EC* encoded = (EC*)malloc(sizeof(EC) * input.length());
+	EC* encoded = (EC*)malloc(sizeof(EC) * inputLen);
 	char* window = (char*)malloc(sizeof(char) * SLIDE_WINDOW_SIZE);
 
-	// Other variables
-	int index = LOOK_AHEAD_BUFFER_SIZE - 1, encodedIndex = 0;
+	
 
 	// Make sure buffers allocated
 	if (!(encoded && window)) return NULL;
@@ -92,36 +103,39 @@ EC* LZSSEncode(std::string input) {
 			encodedIndex++;
 		}
 		else {
+
 			encoded[encodedIndex] = EC(offset, len);
 			encodedIndex++;
 		}
 
-		printWindow(window);
-
 		if (len == 0) {
 			index++;
-			moveWindowRight(window, input[index]);
+			if (index < inputLen) {
+				moveWindowLeft(window, input[index]);
+			}
+			else {
+				moveWindowLeft(window, 0);
+			}
 		}
 		else {
 			for (int L = 0; L < len; L++) {
 				index++;
-				moveWindowRight(window, input[index]);
+				if (index < inputLen) {
+					moveWindowLeft(window, input[index]);
+				}
+				else {
+					moveWindowLeft(window, 0);
+				}
 			}
 		}
-
-
-		for (int i = 0; i < encodedIndex; i++) {
-			std::cout << encoded[i];
-		}
-		std::cout << "\n\n";
-
-		
 	}
 
+	for (int i = 0; i < encodedIndex; i++) {
+		encoded[i].size = encodedIndex;
+	}
 
-	free(encoded);
 	free(window);
-	return NULL;
+	return encoded;
 }
 
 std::ostream& operator<< (std::ostream& out, const EC& data) {
@@ -142,7 +156,7 @@ void printWindow(char* window) {
 	std::cout << "|\n";
 }
 
-void moveWindowRight(char* window, char nextChar) {
+void moveWindowLeft(char* window, char nextChar) {
 	for (int i = 0; i < SLIDE_WINDOW_SIZE - 1; i++) {
 		window[i] = window[i + 1];
 	}

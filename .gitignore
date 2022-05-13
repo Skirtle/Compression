@@ -15,3 +15,6 @@
 Compression/Compression/Debug/
 Compression/Debug/
 Compression/.vs/Compression/v16/.suo
+*.vsidx
+*.lock
+Compression/.vs/Compression/v17/.suo

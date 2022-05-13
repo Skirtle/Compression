@@ -1,5 +1,7 @@
 // Libraries
 #include <iostream>
+#include <bitset>
+#include <cassert>
 
 
 // Globals
@@ -46,6 +48,12 @@ int main() {
 	
 	printEncode(encoded);
 	encodeDecode(testStr);
+
+
+	/*std::bitset<8> bits;
+	bits |= 0b10101010;
+
+	std::cout << bits << std::endl;*/
 
 
 	free(encoded);
